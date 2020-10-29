@@ -1,0 +1,17 @@
+github.com/aws/aws-sdk-go v1.16.8-0.20181217231416-7c690b7a4c41 h1:beR3+1vKU/Lf5IY1P3fHbqy1EUBumZ/eUeqNRzA9RGY=
+github.com/aws/aws-sdk-go v1.16.8-0.20181217231416-7c690b7a4c41/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
+github.com/bugsnag/bugsnag-go v1.4.0 h1:CLCt5wO6/P0GelBEMRrlF52XveQMnnXHoCoxGZ+8a5g=
+github.com/bugsnag/bugsnag-go v1.4.0/go.mod h1:2oa8nejYd4cQ/b0hMIopN0lCRxU0bueqREvZLWFrtK8=
+github.com/bugsnag/panicwrap v1.2.1-0.20180510051541-1d162ee1264c h1:rkO0sdPFzRn8jMoAzk5XEkKurUkgWt/IgGiTE89wJb0=
+github.com/bugsnag/panicwrap v1.2.1-0.20180510051541-1d162ee1264c/go.mod h1:D/8v3kj0zr8ZAKg1AQ6crr+5VwKN5eIywRkfhyM/+dE=
+github.com/gofrs/uuid v1.2.0 h1:coDhrjgyJaglxSjxuJdqQSSdUpG3w6p1OwN2od6frBU=
+github.com/gofrs/uuid v3.3.0+incompatible h1:8K4tyRfvU1CYPgJsveYFQMhpFd/wXNM7iK6rR7UHz84=
+github.com/gofrs/uuid v3.3.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
+github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af h1:pmfjZENx5imkbgOkpRUYLnmbU7UEFbjtDA2hxJ1ichM=
+github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
+github.com/joho/godotenv v1.3.1-0.20181120194748-69ed1d913aa8 h1:vl9Dx+WZL4Ec+pW96v24t+EQ73w0xw5xpgwTUfoJAVQ=
+github.com/joho/godotenv v1.3.1-0.20181120194748-69ed1d913aa8/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
+github.com/julienschmidt/httprouter v1.2.1-0.20181021223831-26a05976f9bf h1:wpJKNUBPBOzWjszbS9cRGFi2BBmG5g7q06FFRSHewWc=
+github.com/julienschmidt/httprouter v1.2.1-0.20181021223831-26a05976f9bf/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
+github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 h1:PJPDf8OUfOK1bb/NeTKd4f1QXZItOX389VN3B6qC8ro=
+github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1/go.mod h1:1NbS8ALrpOvjt0rHPNLyCIeMtbizbir8U//inJ+zuB8=
