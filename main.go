@@ -2,29 +2,27 @@ package main
 
 import (
 	"log"
-	"net/http"
-	"os"
 
-	"github.com/geckoboard/slash-infra/slackutil"
 	"github.com/joho/godotenv"
+	"github.com/spf13/cobra"
+
+	"github.com/geckoboard/slash-infra/cmd/http"
+)
+
+var (
+	rootCmd = &cobra.Command{
+		Use:   "slash-infra",
+		Short: "A slackbot for working with AWS infrastructure",
+	}
 )
 
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile)
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("could not load .env file", err)
-	}
+	// In development it's easier to store environment variables in a .env folder
+	godotenv.Load()
 
-	server := makeHttpHandler()
+	rootCmd.AddCommand(http.Command())
 
-	handler := slackutil.VerifyRequestSignature(os.Getenv("SLACK_SIGNING_SECRET"))(server)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8090"
-	}
-
-	log.Fatal(http.ListenAndServe(":"+port, handler))
+	rootCmd.Execute()
 }

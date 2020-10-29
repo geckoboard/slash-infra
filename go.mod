@@ -11,4 +11,5 @@ require (
 	github.com/joho/godotenv v1.3.1-0.20181120194748-69ed1d913aa8
 	github.com/julienschmidt/httprouter v1.2.1-0.20181021223831-26a05976f9bf
 	github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 // indirect
+	github.com/spf13/cobra v1.1.1
 )

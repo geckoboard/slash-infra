@@ -30,6 +30,7 @@ github.com/aws/aws-sdk-go/private/protocol/query/queryutil
 github.com/aws/aws-sdk-go/private/protocol/rest
 github.com/aws/aws-sdk-go/private/protocol/xml/xmlutil
 github.com/aws/aws-sdk-go/service/ec2
+github.com/aws/aws-sdk-go/service/sqs
 github.com/aws/aws-sdk-go/service/sts
 # github.com/bugsnag/bugsnag-go v1.4.0
 ## explicit
@@ -44,6 +45,8 @@ github.com/bugsnag/panicwrap
 # github.com/gofrs/uuid v3.3.0+incompatible
 ## explicit
 github.com/gofrs/uuid
+# github.com/inconshreveable/mousetrap v1.0.0
+github.com/inconshreveable/mousetrap
 # github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 ## explicit
 github.com/jmespath/go-jmespath
@@ -56,3 +59,8 @@ github.com/julienschmidt/httprouter
 # github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1
 ## explicit
 github.com/kardianos/osext
+# github.com/spf13/cobra v1.1.1
+## explicit
+github.com/spf13/cobra
+# github.com/spf13/pflag v1.0.5
+github.com/spf13/pflag
