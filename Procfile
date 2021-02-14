@@ -1,1 +1,1 @@
-web: ./bin/slash-infra
+web: ./bin/slash-infra http
