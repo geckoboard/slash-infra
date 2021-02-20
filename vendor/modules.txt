@@ -42,6 +42,9 @@ github.com/bugsnag/bugsnag-go/sessions
 # github.com/bugsnag/panicwrap v1.2.1-0.20180510051541-1d162ee1264c
 ## explicit
 github.com/bugsnag/panicwrap
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
 # github.com/gofrs/uuid v3.3.0+incompatible
 ## explicit
 github.com/gofrs/uuid
@@ -59,6 +62,9 @@ github.com/julienschmidt/httprouter
 # github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1
 ## explicit
 github.com/kardianos/osext
+# github.com/mitchellh/mapstructure v1.1.2
+## explicit
+github.com/mitchellh/mapstructure
 # github.com/spf13/cobra v1.1.1
 ## explicit
 github.com/spf13/cobra

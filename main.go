@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 
+	"github.com/geckoboard/slash-infra/cmd/debug"
 	"github.com/geckoboard/slash-infra/cmd/slackbot"
 )
 
@@ -23,6 +24,7 @@ func main() {
 	godotenv.Load()
 
 	rootCmd.AddCommand(slackbot.Command())
+	rootCmd.AddCommand(debug.Command())
 
 	rootCmd.Execute()
 }

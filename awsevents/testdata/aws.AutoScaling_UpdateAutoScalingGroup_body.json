@@ -1,0 +1,50 @@
+{
+  "version": "0",
+  "id": "c8f7930e-97de-5500-d02d-0879c334cbd4",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.autoscaling",
+  "account": "691393038123",
+  "time": "2020-10-29T19:41:04Z",
+  "region": "eu-west-2",
+  "resources": [],
+  "detail": {
+    "eventVersion": "1.05",
+    "userIdentity": {
+      "type": "AssumedRole",
+      "principalId": "AROAIPEO7J5EBVQZVW6DW:matt.button",
+      "arn": "arn:aws:sts::691393038123:assumed-role/Admin/matt.button",
+      "accountId": "691393038123",
+      "accessKeyId": "ASIA2B6R4Q4V4O4PTA5F",
+      "sessionContext": {
+        "sessionIssuer": {
+          "type": "Role",
+          "principalId": "AROAIPEO7J5EBVQZVW6DW",
+          "arn": "arn:aws:iam::691393038123:role/Admin",
+          "accountId": "691393038123",
+          "userName": "Admin"
+        },
+        "webIdFederationData": {},
+        "attributes": {
+          "mfaAuthenticated": "true",
+          "creationDate": "2020-10-29T18:44:13Z"
+        }
+      }
+    },
+    "eventTime": "2020-10-29T19:41:04Z",
+    "eventSource": "autoscaling.amazonaws.com",
+    "eventName": "UpdateAutoScalingGroup",
+    "awsRegion": "eu-west-2",
+    "sourceIPAddress": "81.2.79.46",
+    "userAgent": "aws-internal/3 aws-sdk-java/1.11.864 Linux/4.9.217-0.3.ac.206.84.332.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.262-b10 java/1.8.0_262 vendor/Oracle_Corporation",
+    "requestParameters": {
+      "maxSize": 1,
+      "minSize": 0,
+      "desiredCapacity": 0,
+      "autoScalingGroupName": "asg-dev-vpc-orchestration-20200401104730750300000008"
+    },
+    "responseElements": null,
+    "requestID": "b47ea3a4-ad39-4a7c-8823-6489e9a51649",
+    "eventID": "4f3e3cad-a9d8-48d8-a863-188528d61cc8",
+    "eventType": "AwsApiCall"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "version": "0",
+  "id": "a371fce5-fee5-5a1e-bc3d-8e3cb414d01b",
+  "detail-type": "EC2 Instance Launch Unsuccessful",
+  "source": "aws.autoscaling",
+  "account": "691393038123",
+  "time": "2021-02-16T16:01:40Z",
+  "region": "eu-west-2",
+  "resources": [
+    "arn:aws:autoscaling:eu-west-2:691393038123:autoScalingGroup:f22547a6-bfbe-4fe9-9faf-bfdca31cd0ec:autoScalingGroupName/asg-dev-vpc-schedulers-2020120410552969300000000b",
+    "arn:aws:ec2:eu-west-2:691393038123:instance/i-0655a51b265a9c35d"
+  ],
+  "detail": {
+    "Description": "Launching a new EC2 instance: i-0655a51b265a9c35d.  Status Reason: Instance failed to complete user's Lifecycle Action: Lifecycle Action with token 05ed085a-c77c-4afc-a89b-7284a9cdcccc was abandoned: Lifecycle Action Completed with ABANDON Result",
+    "Details": {
+      "Subnet ID": "subnet-0268ee8176ee785bb",
+      "Availability Zone": "eu-west-2b"
+    },
+    "EndTime": "2021-02-16T16:01:40.000Z",
+    "RequestId": "8c45deae-30e2-1383-efb4-c7a21ae1c467",
+    "ActivityId": "8c45deae-30e2-1383-efb4-c7a21ae1c467",
+    "Cause": "At 2021-02-16T15:53:47Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 1.",
+    "AutoScalingGroupName": "asg-dev-vpc-schedulers-2020120410552969300000000b",
+    "StartTime": "2021-02-16T15:53:49.444Z",
+    "EC2InstanceId": "i-0655a51b265a9c35d",
+    "StatusCode": "Cancelled",
+    "StatusMessage": "Instance failed to complete user's Lifecycle Action: Lifecycle Action with token 05ed085a-c77c-4afc-a89b-7284a9cdcccc was abandoned: Lifecycle Action Completed with ABANDON Result"
+  }
+}
