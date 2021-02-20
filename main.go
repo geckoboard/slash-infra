@@ -6,7 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 
-	"github.com/geckoboard/slash-infra/cmd/http"
+	"github.com/geckoboard/slash-infra/cmd/slackbot"
 )
 
 var (
@@ -22,7 +22,7 @@ func main() {
 	// In development it's easier to store environment variables in a .env folder
 	godotenv.Load()
 
-	rootCmd.AddCommand(http.Command())
+	rootCmd.AddCommand(slackbot.Command())
 
 	rootCmd.Execute()
 }

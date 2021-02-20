@@ -1,4 +1,4 @@
-package http
+package slackbot
 
 import (
 	"log"
@@ -11,8 +11,8 @@ import (
 
 func Command() *cobra.Command {
 	return &cobra.Command{
-		Use:   "http",
-		Short: "Run the slack bot HTTP server",
+		Use:   "slackbot",
+		Short: "Run the full slack bot (including http server, and eventbridge listener)",
 		Run: func(cmd *cobra.Command, args []string) {
 			server := makeHttpHandler()
 

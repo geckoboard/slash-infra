@@ -1,1 +1,1 @@
-web: ./bin/slash-infra http
+web: ./bin/slash-infra slackbot
