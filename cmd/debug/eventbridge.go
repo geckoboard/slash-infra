@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -47,15 +48,26 @@ type genericevent interface {
 func (spewer) HandleAWSEvent(ev interface{}) {
 	switch x := ev.(type) {
 	case awsevents.EC2InstanceLaunchSuccessful:
+		if strings.Contains(x.Detail.Cause, "the scheduled action") {
+			fmt.Printf("instance %q scheduled start\n", x.Detail.EC2InstanceID)
+			return
+		}
 		fmt.Printf("instance %q launched successfully at %s\n", x.Detail.EC2InstanceID, x.Detail.StartTime)
 	case awsevents.EC2InstanceLaunchUnsuccessful:
 		fmt.Printf("instance %q did not launch successfully\n", x.Detail.EC2InstanceID)
 	case awsevents.EC2InstanceTerminateSuccessful:
+		// This change is in response to a scheduled scale-down
+		if strings.Contains(x.Detail.Cause, "the scheduled action") {
+			fmt.Printf("instance %q scheduled scale down termination\n", x.Detail.EC2InstanceID)
+			return
+		}
+		if strings.Contains(x.Detail.Cause, "taken out of service in response to an EC2 health check") {
+			fmt.Printf("instance %q failed health check\n", x.Detail.EC2InstanceID)
+			return
+		}
 		fmt.Printf("instance %q was terminated: %q\n", x.Detail.EC2InstanceID, x.Detail.Cause)
 		spew.Dump(x)
 		os.Exit(1)
-	case nil:
-		fmt.Println("WTFFFF")
 	default:
 		//genericEvent := x.(genericevent).GenericAWSEventInfo()
 

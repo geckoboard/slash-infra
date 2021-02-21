@@ -4,16 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/bugsnag/bugsnag-go"
 )
 
 const (
 	// The number of seconds to "reserve" messages from the queue before other consumers can access them
-	visibilityTimeoutSeconds = 5
+	visibilityTimeoutSeconds = 10
 
 	// How long should each poll to the SQS API last when receiving messages
 	waitTimeSeconds = 10
@@ -64,6 +64,7 @@ func (s *SQSConsumer) PollLoop(ctx context.Context, handler EventHandler) error 
 				return context.Canceled
 			}
 
+			bugsnag.Notify(err, ctx)
 			return err
 		}
 
@@ -72,15 +73,19 @@ func (s *SQSConsumer) PollLoop(ctx context.Context, handler EventHandler) error 
 
 			json.NewDecoder(strings.NewReader(*msg.Body)).Decode(&raw)
 
-			//spew.Dump(raw)
-
 			ev, err := decode(raw)
 
 			if err != nil {
-				fmt.Println(err)
+				bugsnag.Notify(err, ctx, bugsnag.MetaData{
+					"Event": {
+						"UntypedStructure": raw,
+					},
+				})
 			}
 
-			handler.HandleAWSEvent(ev)
+			if ev != nil {
+				handler.HandleAWSEvent(ev)
+			}
 			//s.SQSService.DeleteMessageWithContext(aws.Context(ctx), &sqs.DeleteMessageInput{
 			//	QueueUrl:      aws.String(s.SQSQueueURL),
 			//	ReceiptHandle: msg.ReceiptHandle,
