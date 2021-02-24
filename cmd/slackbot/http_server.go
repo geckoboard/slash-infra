@@ -8,22 +8,25 @@ import (
 	"github.com/geckoboard/slash-infra/search"
 	"github.com/geckoboard/slash-infra/slackutil"
 	"github.com/julienschmidt/httprouter"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
-func makeHttpHandler() *httprouter.Router {
+func makeHttpHandler(searchers []SlashInfraSearcher) http.Handler {
 	router := httprouter.New()
 
 	s := httpServer{
-		ec2Resolver: search.NewEc2(),
+		searchers: searchers,
+		slack:     slackutil.New(),
 	}
 
 	router.POST("/slack/infra-search", s.whatIsHandler)
 
-	return router
+	return otelhttp.NewHandler(router, "slash command handler")
 }
 
 type httpServer struct {
-	ec2Resolver *search.EC2Resolver
+	searchers []SlashInfraSearcher
+	slack     *slackutil.Client
 }
 
 func respondWithError(w http.ResponseWriter, statusCode int, msg string) {
@@ -90,27 +93,29 @@ func (h httpServer) whatIsHandler(w http.ResponseWriter, r *http.Request, ps htt
 		},
 
 		Handler: func(ctx context.Context, req slackutil.SlashCommandRequest, resp slackutil.MessageResponder) {
-			resultSets := h.ec2Resolver.Search(ctx, command.Text)
+			for _, searcher := range h.searchers {
+				resultSets := searcher.Search(ctx, command.Text)
 
-			response := slackutil.Response{
-				Attachments: []slackutil.Attachment{},
-			}
-
-			for _, setOfResults := range resultSets {
-				if setOfResults.Kind == "ec2.instance" {
-					if len(setOfResults.Results) == 1 {
-						response.Attachments = append(response.Attachments, FormatEc2InstanceAsAttachment(setOfResults.Results[0]))
-					}
+				response := slackutil.Response{
+					Attachments: []slackutil.Attachment{},
 				}
 
-			}
+				for _, setOfResults := range resultSets {
+					if setOfResults.Kind == "ec2.instance" {
+						if len(setOfResults.Results) == 1 {
+							response.Attachments = append(response.Attachments, FormatEc2InstanceAsAttachment(setOfResults.Results[0]))
+						}
+					}
 
-			resp.PublicResponse(response)
+				}
+
+				resp.PublicResponse(ctx, response)
+			}
 
 		},
 
 		ShowSlashCommandInChannel: true,
 	}
 
-	findResources.Run(w, *command)
+	findResources.Run(r.Context(), h.slack, w, *command)
 }

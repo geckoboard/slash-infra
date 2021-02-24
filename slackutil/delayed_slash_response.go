@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
 	bugsnag "github.com/bugsnag/bugsnag-go"
+	"go.opentelemetry.io/otel/trace"
 )
 
-var slackClient = http.Client{}
 var forceShowSlashCommandInChannelResponse = Response{ResponseType: ResponseInChannel}
 
 type DelayedSlashResponse struct {
@@ -25,7 +24,9 @@ type DelayedSlashResponse struct {
 	Handler func(context.Context, SlashCommandRequest, MessageResponder)
 }
 
-func (d DelayedSlashResponse) Run(w http.ResponseWriter, command SlashCommandRequest) {
+func (d DelayedSlashResponse) Run(ctx context.Context, slackClient *Client, w http.ResponseWriter, command SlashCommandRequest) {
+	ctx = trace.ContextWithSpan(context.Background(), trace.SpanFromContext(ctx))
+
 	if d.ShowSlashCommandInChannel {
 		// By default slack treats responses to slash commands as
 		// "ephemeral", and will prevent the slash command from showing
@@ -39,13 +40,11 @@ func (d DelayedSlashResponse) Run(w http.ResponseWriter, command SlashCommandReq
 
 	// We run the handler in a goroutine so that we can confirm receipt of slack's
 	// slash command webhook (by returning 200 OK) as soon as possible
-	go d.runHandler(command)
+	go d.runHandler(ctx, slackClient, command)
 }
 
-func (d DelayedSlashResponse) runHandler(command SlashCommandRequest) {
-	ctx := context.Background()
-
-	responder := MessageResponder{command}
+func (d DelayedSlashResponse) runHandler(ctx context.Context, slackClient *Client, command SlashCommandRequest) {
+	responder := MessageResponder{command, slackClient}
 
 	done := make(chan struct{})
 
@@ -63,16 +62,17 @@ func (d DelayedSlashResponse) runHandler(command SlashCommandRequest) {
 		case <-done:
 			return
 		case <-notifyUserTimeout:
-			responder.EphemeralResponse(d.PendingResponse)
+			responder.EphemeralResponse(ctx, d.PendingResponse)
 		}
 	}
 }
 
 type MessageResponder struct {
-	command SlashCommandRequest
+	command     SlashCommandRequest
+	slackClient *Client
 }
 
-func (m MessageResponder) EphemeralResponse(resp Response) {
+func (m MessageResponder) EphemeralResponse(ctx context.Context, resp Response) {
 	resp.ResponseType = ResponseEphemeral
 
 	b, err := json.Marshal(&resp)
@@ -84,16 +84,16 @@ func (m MessageResponder) EphemeralResponse(resp Response) {
 	if err != nil {
 		panic(err)
 	}
+	r = r.WithContext(ctx)
 
-	apiResp, err := slackClient.Do(r)
+	httpresp, err := m.slackClient.httpClient.Do(r)
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(apiResp)
+	httpresp.Body.Close()
 }
 
-func (m MessageResponder) PublicResponse(resp Response) {
+func (m MessageResponder) PublicResponse(ctx context.Context, resp Response) {
 	resp.ResponseType = ResponseInChannel
 
 	b, err := json.Marshal(&resp)
@@ -105,13 +105,13 @@ func (m MessageResponder) PublicResponse(resp Response) {
 	if err != nil {
 		panic(err)
 	}
+	r = r.WithContext(ctx)
 
-	apiResp, err := slackClient.Do(r)
+	httpresp, err := m.slackClient.httpClient.Do(r)
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(apiResp)
+	httpresp.Body.Close()
 }
 
 type SlashCommandResponder interface {
