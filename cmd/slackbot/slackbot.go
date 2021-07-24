@@ -6,14 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/geckoboard/slash-infra/awsutil"
 	"github.com/geckoboard/slash-infra/search"
 	"github.com/geckoboard/slash-infra/slackutil"
-	"github.com/hashicorp/go-cleanhttp"
 	"github.com/spf13/cobra"
-
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type SlashInfraSearcher interface {
@@ -28,21 +24,6 @@ func Command() *cobra.Command {
 			creds, err := awsutil.DetectAWSCredentials()
 			if err != nil {
 				log.Fatal("unable to detect AWS credentials", err)
-			}
-
-			awsHTTPClient := cleanhttp.DefaultPooledClient()
-			awsHTTPClient.Transport = otelhttp.NewTransport(
-				awsHTTPClient.Transport,
-				otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
-					return "aws sdk"
-				}),
-			)
-
-			for i, _ := range creds {
-				// Add telemetry to all the SDK http clients
-				creds[i].SDKSession = creds[i].SDKSession.Copy(&aws.Config{
-					HTTPClient: awsHTTPClient,
-				})
 			}
 
 			searchers := []SlashInfraSearcher{

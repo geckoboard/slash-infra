@@ -2,6 +2,7 @@ package awsutil
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
@@ -10,18 +11,20 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/hashicorp/go-cleanhttp"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 const EnvVarPrefixForAwsRoles = "AWS_ROLE_"
 
-type AWSCredentials struct {
+type Alias struct {
 	// SDKSession contains all of the config an SDK client needs to work
 	// It is safe for concurrent use
 	SDKSession *session.Session
 	// AccountID is the numerical ID of the AWS account that owns the role the credentials assume
 	AccountID string
 	// AccountAlias is an underscored alias for this set of credentials
-	AccountAlias string
+	Name string
 }
 
 // DetectAWSCredentials uses environment variables to build instances
@@ -43,9 +46,17 @@ type AWSCredentials struct {
 // AWS_ROLE_DEV_US_EAST=...
 // AWS_ROLE_DEV_EU=...
 // ```
-func DetectAWSCredentials() ([]AWSCredentials, error) {
-	detected := []AWSCredentials{}
+func DetectAWSCredentials() ([]Alias, error) {
+	detected := []Alias{}
 	environ := os.Environ()
+
+	awsHTTPClient := cleanhttp.DefaultPooledClient()
+	awsHTTPClient.Transport = otelhttp.NewTransport(
+		awsHTTPClient.Transport,
+		otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+			return "aws sdk"
+		}),
+	)
 
 	for _, pair := range environ {
 		if !strings.HasPrefix(pair, EnvVarPrefixForAwsRoles) {
@@ -70,6 +81,7 @@ func DetectAWSCredentials() ([]AWSCredentials, error) {
 		sess, err := session.NewSession(&aws.Config{
 			Credentials: credentials.NewEnvCredentials(),
 			Region:      aws.String(region),
+			HTTPClient:  awsHTTPClient,
 		})
 		if err != nil {
 			return nil, err
@@ -80,14 +92,14 @@ func DetectAWSCredentials() ([]AWSCredentials, error) {
 			return nil, err
 		}
 
-		creds := AWSCredentials{
+		alias := Alias{
 			SDKSession: sess.Copy(&aws.Config{
 				Credentials: stscreds.NewCredentials(sess, roleArn),
 			}),
-			AccountID:    role.AccountID,
-			AccountAlias: awsAccountAlias,
+			AccountID: role.AccountID,
+			Name:      awsAccountAlias,
 		}
-		detected = append(detected, creds)
+		detected = append(detected, alias)
 	}
 
 	return detected, nil

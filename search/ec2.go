@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	bugsnag "github.com/bugsnag/bugsnag-go"
 	"github.com/geckoboard/slash-infra/awsutil"
+	"go.opentelemetry.io/otel"
 )
 
 // This is 17 characters plus the "i-" prefix
@@ -50,20 +51,25 @@ type ResultSet struct {
 	Results    []Result
 }
 
-func NewEC2Resolver(creds []awsutil.AWSCredentials) *EC2Resolver {
+type EC2Alias struct {
+	awsutil.Alias
+	sdk ec2SDK
+}
+
+func NewEC2Resolver(creds []awsutil.Alias) *EC2Resolver {
 	e := EC2Resolver{
-		clients: make([]ec2SDK, 0, len(creds)),
+		clients: make([]EC2Alias, 0, len(creds)),
 	}
 
 	for _, alias := range creds {
-		e.clients = append(e.clients, ec2.New(alias.SDKSession))
+		e.clients = append(e.clients, EC2Alias{alias, ec2.New(alias.SDKSession)})
 	}
 
 	return &e
 }
 
 type EC2Resolver struct {
-	clients []ec2SDK
+	clients []EC2Alias
 }
 
 func (e *EC2Resolver) Search(ctx context.Context, query string) []ResultSet {
@@ -71,13 +77,15 @@ func (e *EC2Resolver) Search(ctx context.Context, query string) []ResultSet {
 
 	query = strings.TrimSpace(query)
 
-	searchFuncs := []func(context.Context, ec2SDK, string) (*ResultSet, error){
-		findEC2InstancesByID,
+	searchFuncs := map[string]func(context.Context, ec2SDK, string) (*ResultSet, error){
+		"ec2 instance by ID": findEC2InstancesByID,
 	}
 
-	for _, searcher := range searchFuncs {
+	for searchFor, searcher := range searchFuncs {
 		for _, client := range e.clients {
-			result, err := searcher(ctx, client, query)
+			ctx, span := otel.Tracer("github.com/geckoboard/slash-infra/search").Start(ctx, searchFor)
+			result, err := searcher(ctx, client.sdk, query)
+			span.End()
 
 			if err != nil {
 				log.Print(err)
